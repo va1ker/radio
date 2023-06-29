@@ -1,13 +1,19 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
 
 # class User(models.User):
 #     username = models.CharField(max_length=100)
 #     password = models.CharField(max_length=100)
 
 
+class Links(models.Model):
+    link = models.TextField()
+    is_parsed = models.BooleanField(default=False)
+
+
 class Country(models.Model):
     country_name = models.CharField(max_length=100, unique=True)
+    link = models.TextField()
 
     def __str__(self):
         return self.country_name

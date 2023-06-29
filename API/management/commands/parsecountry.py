@@ -1,90 +1,72 @@
+from typing import Any
+
+import requests
+from alive_progress import alive_bar
+from bs4 import BeautifulSoup
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand
-from ...models import Country, State, City, Genre, Station
-import alive_progress
-import json
+
+from ...models import City, Country, Genre, Links, State, Station
 
 
 class Command(BaseCommand):
-    pass
+    def handle(self, *args: Any, **options: Any) -> str | None:
+        Parser.station_links_parser()
 
-    def handle(self, *args, **option):
-        from bs4 import BeautifulSoup
-        from requests import get
 
-        url = get("https://mytuner-radio.com/" + "radio/")
-        soup = BeautifulSoup(url.text, "lxml")
-        with alive_progress.alive_bar(1) as bar:
-            print("Parsing countries...")
-            all_href = soup.find("div", class_="continents").find_all("a")
-            countries_links = [item.get("href") for item in all_href]
-            bar()
-        for link in countries_links:
-            url = get("https://mytuner-radio.com" + link)
-            soup = BeautifulSoup(url.text, "lxml")
-            try:
-                options = soup.find("div", class_="styled-select").find_all("option")
-            except AttributeError:
-                options = [1]
-            for i in range(len(options)):
-                url = get(
-                    "https://mytuner-radio.com"
-                    + countries_links[countries_links.index(link)]
-                    + f"?page={i}"
-                )
-                soup = BeautifulSoup(url.text, "lxml")
-                all_stations = soup.find("ul", class_="radio-list").find_all("a")
-                all_stations = [i.get("href") for i in all_stations]
-                for station in all_stations:
-                    url = get("https://mytuner-radio.com" + station)
-                    soup = BeautifulSoup(url.text, "lxml")
-                    container = soup.find("div", id="left-container")
-                    location = container.find("div", class_="breadcrumbs").find_all("a")
-                    location = [item.text for item in location]
-                    try:
-                        Country.objects.filter(country_name=location[0]).exists()
-                        country_id = Country.objects.get(country_name=location[0]).id
-                    except Country.DoesNotExist:
-                        Country.objects.create(country_name=location[0])
-                        country_id = Country.objects.get(country_name=location[0]).id
-                    if len(location) > 1:
-                        try:
-                            State.objects.filter(state_name=location[1]).exists()
-                            state_id = State.objects.get(state_name=location[1])
-                        except State.DoesNotExist:
-                            State.objects.create(
-                                country_id=country_id, state_name=location[1]
-                            )
-                            state_id = State.objects.get(state_name=location[1])
-                        try:
-                            City.objects.filter(city_name=location[2]).exists()
-                            city_id = City.objects.get(city_name=location[2])
-                        except City.DoesNotExist:
-                            City.objects.create(
-                                country_id=country_id,
-                                state_id=state_id,
-                                city_name=location[2],
-                            )
-                            city_id = City.objects.get(city_name=location[2])
-                    categories = container.find("div", class_="categories").find_all(
-                        "a"
+url = "https://mytuner-radio.com"
+
+
+class Parser:
+    @staticmethod
+    def station_links_parser():
+        soup = BeautifulSoup(requests.get(url).text, "lxml")
+        continents = soup.find(class_="continents")
+        continents_links = []
+        for continent_link in continents.find_all("a"):
+            continents_links.append(url + continent_link.get("href"))
+        with alive_bar(149) as bar:
+            for continent_link in continents_links:
+                option = BeautifulSoup(requests.get(continent_link).text, "lxml").find_all("option")
+                for page in range(1, len(option) + 1):
+                    stations = (
+                        BeautifulSoup(requests.get(continent_link + f"?page={page}").text, "lxml")
+                        .find("ul", class_="radio-list")
+                        .find_all("a")
                     )
-                    genres = []
-                    for c in categories:
+                    for station in stations:
                         try:
-                            Genre.objects.filter(genre=c.text).exists()
-                            genres.append(Genre.objects.get(genre=c.text))
-                        except Genre.DoesNotExist:
-                            Genre.objects.create(genre=c.text)
-                            genres.append(Genre.objects.get(genre=c.text))
-                    station_name = container.find("h1", class_="title").text
-                    fdiv = container.find("div", class_="frequencies")
-                    fname = fdiv.find_all("div", class_="name")
-                    fvalue = fdiv.find_all("div", class_="frequency")
-                    frequencies = {}
-                    if fname:
-                        for i, k in fname, fvalue:
-                            frequencies[i.text] = k.text
-                    contacts = soup.find("contacts").find_all("p")
-                    if contacts:
-                        for contact in contacts:
-                            contact.text.replace("&nbsp", " ").split()
+                            Links.objects.get(link=url + station.get("href"))
+                        except ObjectDoesNotExist:
+                            obj = Links.objects.create(link=url + station.get("href"))
+                            obj.save()
+                bar()
+
+    def station_name_parser(link):
+        return BeautifulSoup(requests.get(link).text, "lxml").find("h1", class_="title").get_text()
+
+    def genres_parser(link):
+        genres = BeautifulSoup(requests.get(link).text, "lxml").find("div", class_="categories").find_all("a")
+        return [genre.get_text() for genre in genres]
+
+    def contacts_parser(link):
+        p_tags = BeautifulSoup(requests.get(link).text, "lxml").find("div", class_="contacts").find_all("p")
+        return dict([p.get_text().split("&nbsp") for p in p_tags])
+
+    def frequency_parser(link):
+        li_tags = BeautifulSoup(requests.get(link).text, "lxml").find("div", class_="frequencies").find_all("div")
+        li = [i.get_text().strip("\n") for i in li_tags]
+        return dict(zip(li[::2], li[1::2]))
+
+    def social_parser(link):
+        extra = BeautifulSoup(requests.get(link).text, "lxml").find("div", class_="extra").find_all("a")
+        return dict(zip([i.get("aria-label") for i in extra], [i.get("href") for i in extra]))
+
+    def country_parser(link):
+        return BeautifulSoup(requests.get(link).text, "lxml").find("a", class_="radio_country_list").get_text()
+
+    def state_parser(link):
+        return BeautifulSoup(requests.get(link).text, "lxml").find("a", class_="radio_state_list").get_text()
+
+    def town_parser(link):
+        return BeautifulSoup(requests.get(link).text, "lxml").find("a", class_="radio_city_list").get_text()

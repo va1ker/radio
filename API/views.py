@@ -1,12 +1,8 @@
 from django.shortcuts import render
-from rest_framework import generics
-from .models import Station, Country, City
-from .serializers import (
-    StationSerializer,
-    CountrySerializer,
-    CitySerializer,
-)
-from rest_framework import serializers
+from rest_framework import generics, serializers
+
+from .models import City, Country, Station
+from .serializers import CitySerializer, CountrySerializer, StationSerializer
 
 
 class StationAPI(generics.ListAPIView):
