@@ -17,12 +17,12 @@ from django.contrib import admin
 from django.urls import path
 from django.views.generic import TemplateView
 
-from API.views import CityAPI, CountryAPI, StationAPI
+from API.views import CityAPI, CountryAPI, StationAPI, LinksForParsingAPI
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/countrys", CountryAPI.as_view()),
-    path("api/cities", CityAPI.as_view()),
+    path("api/countrys/", CountryAPI.as_view()),
+    path("api/cities/", CityAPI.as_view()),
     path(
         "swagger-ui/",
         TemplateView.as_view(
@@ -31,4 +31,5 @@ urlpatterns = [
         ),
         name="swagger-ui",
     ),
+    path("api/links/", LinksForParsingAPI.as_view()),
 ]
