@@ -29,7 +29,7 @@ class LinksParser:
                 bar()
 
 
-class SoupOjbectParser:
+class RadioStationSoupObjectParser:
     def get_station_name(soup):
         return soup.find("h1", class_="title").get_text()
 
