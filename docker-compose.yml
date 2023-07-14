@@ -1,0 +1,67 @@
+services:
+
+  web:
+    build: .
+    # command: python manage.py runserver
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  postgres:
+    image: postgres:15
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: django_celery_example_celery_worker
+    command: /start-celeryworker
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+      - postgres
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: django_celery_example_celery_beat
+    command: /start-celerybeat
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+      - postgres
+
+  flower:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: django_celery_example_celery_flower
+    command: /start-flower
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    ports:
+      - 5557:5555
+    depends_on:
+      - rabbitmq
+      - postgres

@@ -14,6 +14,7 @@ class LinksParser:
             continents_links.append(url + continent_link.get("href"))
         return continents_links, url
 
+    @staticmethod
     def station_links_parser(links, url):
         with alive_bar(149) as bar:
             for continent_link in links:
@@ -29,32 +30,68 @@ class LinksParser:
                 bar()
 
 
-class RadioStationSoupObjectParser:
+class StationPageSoupParser:
+    @staticmethod
     def get_station_name(soup):
-        return soup.find("h1", class_="title").get_text()
+        try:
+            h1 = soup.find("h1", class_="title")
+            return h1.get_text()
+        except AttributeError:
+            return ""
 
+    @staticmethod
     def get_genres(soup):
-        genres = soup.find("div", class_="categories").find_all("a")
-        return [genre.get_text() for genre in genres]
+        try:
+            genres = soup.find("div", class_="categories").find_all("a")
+            return [genre.get_text() for genre in genres]
+        except AttributeError:
+            return ""
 
+    @staticmethod
     def get_contacts(soup):
-        p_tags = soup.find("div", class_="contacts").find_all("p")
-        return dict([p.get_text().split("&nbsp") for p in p_tags])
+        try:
+            contacts = soup.find("div", class_="contacts").find_all("p")
+            return dict([p.get_text().split("&nbsp") for p in contacts])
+        except AttributeError:
+            return {}
 
+    @staticmethod
     def get_frequency(soup):
-        li_tags = soup.find("div", class_="frequencies").find_all("div")
-        li = [i.get_text().strip("\n") for i in li_tags]
-        return dict(zip(li[::2], li[1::2]))
+        try:
+            li_tags = soup.find("div", class_="frequencies").find_all("div")
+            li = [i.get_text().strip("\n") for i in li_tags]
+            return dict(zip(li[::2], li[1::2]))
+        except AttributeError:
+            return {}
 
+    @staticmethod
     def get_socials(soup):
-        extra = soup.find("div", class_="extra").find_all("a")
-        return dict(zip([i.get("aria-label") for i in extra], [i.get("href") for i in extra]))
+        try:
+            socials = soup.find("div", class_="extra").find_all("a")
+            return dict(zip([i.get("aria-label") for i in socials], [i.get("href") for i in socials]))
+        except AttributeError:
+            return {}
 
+    @staticmethod
     def get_country(soup):
-        return soup.find("a", class_="radio_country_list").get_text()
+        try:
+            country = soup.find("a", class_="radio_country_list")
+            return country.get_text()
+        except AttributeError:
+            return ""
 
+    @staticmethod
     def get_state(soup):
-        return soup.find("a", class_="radio_state_list").get_text()
+        try:
+            state = soup.find("a", class_="radio_state_list")
+            return state.get_text()
+        except AttributeError:
+            return ""
 
+    @staticmethod
     def get_city(soup):
-        return soup.find("a", class_="radio_city_list").get_text()
+        try:
+            city = soup.find("a", class_="radio_city_list")
+            return city.get_text()
+        except AttributeError:
+            return ""
