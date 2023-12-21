@@ -3,3 +3,4 @@ radioAPI/__pycache__/
 API/__pycache__/
 API/migrations/__pycache__/
 .venv/
+.env
