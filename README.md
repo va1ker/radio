@@ -1,1 +1,4 @@
-- [Я злой крот](bebebeb)
+Запуск 
+```bash
+docker compose up
+```
