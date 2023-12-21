@@ -41,7 +41,6 @@ class Station(models.Model):
     genres = models.ManyToManyField(Genre)
     contacts = models.JSONField()
     socials = models.JSONField()
-    #   likes = models.PositiveIntegerField()
 
     def __str__(self):
         return self.station_name

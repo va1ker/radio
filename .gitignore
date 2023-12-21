@@ -1,6 +1,8 @@
-__pycache__/
+.__pycache__/
 radioAPI/__pycache__/
 API/__pycache__/
 API/migrations/__pycache__/
 .venv/
 .env
+.API/management/__pycache__/
+.API/management/commands/__pycache__/

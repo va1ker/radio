@@ -11,25 +11,31 @@ class LinksParser:
         continents = soup.find(class_="continents")
         continents_links = []
         for continent_link in continents.find_all("a"):
-            continents_links.append(url + continent_link.get("href"))
+            continents_links.append(url.strip(" \n") + continent_link.get("href").strip(" \n"))
+        print(continents_links)
         return continents_links, url
 
     def station_links_parser(links, url):
         with alive_bar(149) as bar:
             for continent_link in links:
-                option_text = BeautifulSoup(requests.get(continent_link).text, "lxml").find_all("option")
-                for page in range(1, len(option_text) + 1):
-                    stations = (
-                        BeautifulSoup(requests.get(continent_link + f"?page={page}").text, "lxml")
-                        .find("ul", class_="radio-list")
-                        .find_all("a")
-                    )
+                pages_req = BeautifulSoup(requests.get(continent_link).text, "lxml")
+                try:
+                    pages_tag = pages_req.find("div", class_="pages")
+                    if pages_tag:
+                        pages = len(pages_tag.find_all("a"))
+                    else:
+                        pages = 0
+                except AttributeError:
+                    pages = 0
+                for page in range(1, pages + 1):
+                    req = requests.get(continent_link + f"?page={page}").text
+                    stations = BeautifulSoup(req, "lxml").find("div", class_="radio-list").find_all("a")
                     for station in stations:
                         Links.objects.get_or_create(link=url + station.get("href"))
                 bar()
 
 
-class RadioStationSoupObjectParser:
+class SoupObjectParser:
     def get_station_name(soup):
         return soup.find("h1", class_="title").get_text()
 
