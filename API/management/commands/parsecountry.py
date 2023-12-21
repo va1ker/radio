@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
             country_obj = Country.objects.get_or_create(country)
             state_obj = State.objects.get_or_create(country_obj, state)
-            city_obj = City.objects.get_or_create(country_obj,state_obj, city)
+            city_obj = City.objects.get_or_create(country_obj, state_obj, city)
             genres_obj = Genre.objects.get_or_create(genres)
             station_obj = {
                 "station_name": station_name,
@@ -32,10 +32,9 @@ class Command(BaseCommand):
                 "genres": genres_obj,
                 "social": socials,
                 "contacts": contacts,
-                "frequencies": frequencies
+                "frequencies": frequencies,
             }
             Station.objects.get_or_create(station_obj)
-
 
 
 LinksParser.country_links_parser("https://mytuner-radio.com")

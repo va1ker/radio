@@ -20,6 +20,7 @@ class CitySerializer(serializers.ModelSerializer):
         model = City
         fields = "__all__"
 
+
 class LinksSerializer(serializers.ModelSerializer):
     class Meta:
         model = Links

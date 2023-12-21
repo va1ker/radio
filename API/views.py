@@ -14,6 +14,7 @@ class CountryAPI(generics.ListAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
 
+
 class LinksForParsingAPI(generics.ListAPIView):
     queryset = Links.objects.all()
     serializer_class = LinksSerializer
