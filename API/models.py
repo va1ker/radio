@@ -13,7 +13,6 @@ class Links(models.Model):
 
 class Country(models.Model):
     country_name = models.CharField(max_length=100, unique=True)
-    link = models.TextField()
 
     def __str__(self):
         return self.country_name
@@ -21,7 +20,7 @@ class Country(models.Model):
 
 class State(models.Model):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
-    state_name = models.CharField(max_length=100, unique=True)
+    state_name = models.CharField(max_length=100)
 
 
 class City(models.Model):
