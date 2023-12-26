@@ -2,12 +2,14 @@ from celery import shared_task
 import requests
 from bs4 import BeautifulSoup
 from API.management.commands.parsers import SoupObjectParser
-from API.models import Country,State,City,Station,Genre
+from API.models import Country, State, City, Station, Genre, Links
+from radioAPI.celery import app
 
-@shared_task
-def station_parse(link):
-    req = requests.get(link.link)
-    soup = BeautifulSoup(req.text).find("div", class_="left-container")  ## Сделать проверку на статус код
+
+@app.task
+def create_station(link):
+    request = requests.get(link)
+    soup = BeautifulSoup(request.text).find("div", class_="left-container")
     station_name = SoupObjectParser.get_station_name(soup)
     country = SoupObjectParser.get_country(soup)
     state = SoupObjectParser.get_state(soup)
@@ -16,7 +18,6 @@ def station_parse(link):
     socials = SoupObjectParser.get_socials(soup)
     contacts = SoupObjectParser.get_contacts(soup)
     frequencies = SoupObjectParser.get_frequency(soup)
-
 
     country_obj, _ = Country.objects.get_or_create(country_name=country)
     state_obj, _ = State.objects.get_or_create(country=country_obj, state_name=state)
@@ -35,3 +36,4 @@ def station_parse(link):
         genre, _ = Genre.objects.get_or_create(genre=genre)
         station.genres.add(genre)
     station.save()
+    Links.objects.filter(link=link).update(is_parsed=True)

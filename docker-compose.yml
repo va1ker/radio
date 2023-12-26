@@ -39,7 +39,7 @@ services:
   celery-worker:
     build:
       context: .
-    command: celery -A radioAPI worker --concurrency=4 --loglevel=info
+    command: celery -A radioAPI worker --concurrency=12 --loglevel=info
     volumes:
       - .:/app
     env_file:
@@ -57,7 +57,7 @@ services:
     env_file:
       - ./.env
     ports:
-      - 5557:5555
+      - 5555:5555
     depends_on:
       - redis
       - postgres
