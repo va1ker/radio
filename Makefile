@@ -1,8 +1,12 @@
 parsecountry:
 	docker exec django_backend python manage.py parsecountry
 
-makemigration:
-	docker exec django_backend python manage.py makemigration
+parsestations:
+	docker exec django_backend python manage.py parsestations
+
+makemigrations:
+	docker exec django_backend python manage.py makemigrations
 
 migrate:
 	docker exec django_backend python manage.py migrate
+

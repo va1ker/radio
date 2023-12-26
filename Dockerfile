@@ -5,6 +5,8 @@ RUN apt update \
 RUN mkdir /app
 WORKDIR /app
 COPY pyproject.toml /app/
+COPY .env /app/
+ENV $(cat .env | grep -v ^# | xargs)
 RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python && \
     cd /usr/local/bin && \
     ln -s /opt/poetry/bin/poetry && \
