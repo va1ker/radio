@@ -6,3 +6,5 @@ API/migrations/__pycache__/
 .env
 .API/management/__pycache__/
 .API/management/commands/__pycache__/
+backup.dump
+backup.json
