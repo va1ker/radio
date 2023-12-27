@@ -5,21 +5,15 @@ from .models import City, Country, Station, Links
 from .serializers import CitySerializer, CountrySerializer, StationSerializer, LinksSerializer
 
 
-class StationAPI(generics.ListAPIView):
+class StationList(generics.ListAPIView):
     queryset = Station.objects.all()
     serializer_class = StationSerializer
 
+    def get_queryset(self):
+        queryset = Station.objects.all()
+        city_name = self.request.query_params.get("city", None)
 
-class CountryAPI(generics.ListAPIView):
-    queryset = Country.objects.all()
-    serializer_class = CountrySerializer
+        if city_name:
+            queryset = queryset.filter(city__city_name__icontains=city_name)
 
-
-class LinksForParsingAPI(generics.ListAPIView):
-    queryset = Links.objects.all()
-    serializer_class = LinksSerializer
-
-
-class CityAPI(generics.ListAPIView):
-    queryset = City.objects.select_related("country", "state")
-    serializer_class = CitySerializer
+        return queryset
