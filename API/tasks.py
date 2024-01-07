@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from API.management.commands.parsers import SoupObjectParser
 from API.models import Country, State, City, Station, Genre, Links
 from radioAPI.celery import app
+from API.management.commands.parsers import SoupObjectParser
 
 
 @app.task
@@ -37,3 +38,37 @@ def create_station(link):
         station.genres.add(genre)
     station.save()
     Links.objects.filter(link=link).update(is_parsed=True)
+
+
+@app.task
+def country_parse(continent_link):
+    url = "https://mytuner-radio.com"
+    pages_req = BeautifulSoup(requests.get(continent_link).text, "html.parser")
+    try:
+        pages_tag = pages_req.find("div", class_="pages")
+        pages = len(pages_tag.find_all("a"))
+    except AttributeError:  ### Переписать
+        pages = 0
+    for page in range(1, pages + 1):
+        req = requests.get(continent_link + f"?page={page}").text
+        stations = BeautifulSoup(req, "html.parser").find("div", class_="radio-list").find("ul").find_all("a")
+        for station in stations:
+            Links.objects.get_or_create(link=url + station.get("href"))
+
+
+@app.task
+def update_country(link):
+    req = requests.get(link).text
+    soup = BeautifulSoup(req)
+    station_name = SoupObjectParser.get_station_name(soup)
+    country_name = SoupObjectParser.get_country(soup)
+    state_name = SoupObjectParser.get_state(soup)
+    try:
+        country_obj = Country.objects.get(country_name=country_name)
+        state_obj = State.objects.get(state_name=state_name)
+        station_obj = Station.objects.get(station_name=station_name)
+        station_obj.country = country_obj
+        station_obj.state = state_obj
+        station_obj.save()
+    except:
+        pass
