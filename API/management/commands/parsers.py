@@ -42,13 +42,15 @@ class SoupObjectParser:
 
     @staticmethod
     def get_genres(soup):
-        genres = soup.find("div", class_="categories")
+        genres = soup.find("div", class_="genres")
         return [genre.get_text() for genre in genres.find_all("a")] if genres else []
 
     @staticmethod
     def get_contacts(soup):
         contacts = soup.find("div", class_="contacts")
-        return {contacts[i].get_text(): contacts[i + 1].get_text() for i in range(0, len(contacts), 2)} if contacts else {}
+        return (
+            {contacts[i].get_text(): contacts[i + 1].get_text() for i in range(0, len(contacts), 2)} if contacts else {}
+        )
 
     @staticmethod
     def get_frequency(soup):
@@ -83,4 +85,4 @@ class SoupObjectParser:
     def get_city(soup):
         ul = soup.find("ul", class_="breadcrumbs")
         city = ul.find("a", {"name": "radio_city_list"})
-        return city.get_text() if city else "" ## Исправить
+        return city.get_text() if city else ""  ## Исправить

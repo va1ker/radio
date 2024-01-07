@@ -72,3 +72,18 @@ def update_country(link):
         station_obj.save()
     except:
         pass
+
+@app.task
+def update_genres(link):
+    req = requests.get(link).text
+    soup = BeautifulSoup(req)
+    station_name = SoupObjectParser.get_station_name(soup)
+    genres = SoupObjectParser.get_genres(soup)
+    try:
+        station_obj = Station.objects.get(station_name=station_name)
+        for genre in genres:
+            genre, _ = Genre.objects.get_or_create(genre=genre)
+            station_obj.genres.add(genre)
+        station_obj.save()
+    except:
+        pass
