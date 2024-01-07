@@ -1,6 +1,7 @@
 import requests
 from alive_progress import alive_bar
 from bs4 import BeautifulSoup
+
 from ...models import Links
 
 

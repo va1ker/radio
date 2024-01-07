@@ -1,10 +1,10 @@
-from celery import shared_task
 import requests
 from bs4 import BeautifulSoup
+from celery import shared_task
+
 from API.management.commands.parsers import SoupObjectParser
-from API.models import Country, State, City, Station, Genre, Links
+from API.models import City, Country, Genre, Links, State, Station
 from radioAPI.celery import app
-from API.management.commands.parsers import SoupObjectParser
 
 
 @app.task

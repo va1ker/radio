@@ -1,11 +1,15 @@
 from typing import Any
-from bs4 import BeautifulSoup
+
 import requests
-from django.core.management.base import BaseCommand
-from .parsers import LinksParser, SoupObjectParser
 from alive_progress import alive_bar
-from ...models import City, Country, Genre, Links, State, Station
+from bs4 import BeautifulSoup
+from django.core.management.base import BaseCommand
+
 from API.tasks import update_country
+
+from ...models import City, Country, Genre, Links, State, Station
+from .parsers import LinksParser, SoupObjectParser
+
 
 class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> str | None:

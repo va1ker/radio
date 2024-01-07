@@ -1,11 +1,14 @@
 from typing import Any
-from bs4 import BeautifulSoup
+
 import requests
-from django.core.management.base import BaseCommand
-from .parsers import LinksParser, SoupObjectParser
 from alive_progress import alive_bar
-from ...models import City, Country, Genre, Links, State, Station
+from bs4 import BeautifulSoup
+from django.core.management.base import BaseCommand
+
 from API.tasks import country_parse
+
+from ...models import City, Country, Genre, Links, State, Station
+from .parsers import LinksParser, SoupObjectParser
 
 
 class Command(BaseCommand):

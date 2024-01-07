@@ -25,6 +25,7 @@ coreapi = "^2.3.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
+isort = "^5.13.2"
 
 [tool.black]
 line-length = 120

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import City, Country, Station, Links
+from .models import City, Country, Genre, Links, Station
 
 
 class StationSerializer(serializers.ModelSerializer):
@@ -24,4 +24,9 @@ class CitySerializer(serializers.ModelSerializer):
 class LinksSerializer(serializers.ModelSerializer):
     class Meta:
         model = Links
+        fields = "__all__"
+
+class GenresSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
         fields = "__all__"
