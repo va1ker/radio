@@ -47,8 +47,8 @@ class SoupObjectParser:
 
     @staticmethod
     def get_contacts(soup):
-        p_tags = soup.find("div", class_="contacts")
-        return dict([p.get_text().split("&nbsp") for p in p_tags.find_all("p")]) if p_tags else {}
+        contacts = soup.find("div", class_="contacts")
+        return {contacts[i].get_text(): contacts[i + 1].get_text() for i in range(0, len(contacts), 2)} if contacts else {}
 
     @staticmethod
     def get_frequency(soup):
