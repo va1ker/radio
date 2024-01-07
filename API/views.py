@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework import generics, serializers
 
-from .models import City, Country, Station, Links
-from .serializers import CitySerializer, CountrySerializer, StationSerializer, LinksSerializer
+from .models import City, Country, Genre, Links, Station
+from .serializers import (CitySerializer, CountrySerializer, GenresSerializer,
+                          LinksSerializer, StationSerializer)
 
 
 class StationList(generics.ListAPIView):
@@ -30,6 +31,17 @@ class StationList(generics.ListAPIView):
 class CountryList(generics.ListAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
+
+
+class GenreList(generics.ListAPIView):
+    queryset = Genre.objects.all()
+    serializer_class = GenresSerializer
+
+    def get_queryset(self):
+        queryset = Station.objects.all()
+        genre_name = self.request.query_params.get("genre", None)
+        if genre_name:
+            queryset = queryset.filter(genre__icontains=genre_name)
 
 
 # class StationList(generics.ListAPIView):
