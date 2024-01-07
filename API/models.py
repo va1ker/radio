@@ -36,6 +36,8 @@ class Genre(models.Model):
 class Station(models.Model):
     station_name = models.CharField(max_length=100)
     frequency = models.JSONField()
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True)
+    state = models.ForeignKey(State, on_delete=models.CASCADE,null=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     genres = models.ManyToManyField(Genre)
     contacts = models.JSONField()

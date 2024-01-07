@@ -6,7 +6,7 @@ from .models import City, Country, Station, Links
 class StationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Station
-        fields = ("station_name", "frequency", "city", "genres", "contacts", "socials")
+        fields = "__all__"
 
 
 class CountrySerializer(serializers.ModelSerializer):
