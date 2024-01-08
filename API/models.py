@@ -59,6 +59,3 @@ class Station(models.Model):
 #     socials = models.JSONField()
 #     likes = models.PositiveIntegerField()
 
-
-# class Like(models.Model):
-#     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="likes", on_delete=models.CASCADE)

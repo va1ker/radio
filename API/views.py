@@ -1,9 +1,14 @@
 from django.shortcuts import render
 from rest_framework import generics, serializers
+from django.contrib.auth.models import User
 
 from .models import City, Country, Genre, Links, Station
 from .serializers import (CitySerializer, CountrySerializer, GenresSerializer,
-                          LinksSerializer, StationSerializer)
+                          LinksSerializer, StationSerializer, UserSerializer)
+
+class UserCreateView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
 class StationList(generics.ListAPIView):
