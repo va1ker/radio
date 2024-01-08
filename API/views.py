@@ -3,8 +3,15 @@ from rest_framework import generics, serializers
 from django.contrib.auth.models import User
 
 from .models import City, Country, Genre, Links, Station
-from .serializers import (CitySerializer, CountrySerializer, GenresSerializer,
-                          LinksSerializer, StationSerializer, UserSerializer)
+from .serializers import (
+    CitySerializer,
+    CountrySerializer,
+    GenresSerializer,
+    LinksSerializer,
+    StationSerializer,
+    UserSerializer,
+)
+
 
 class UserCreateView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -20,15 +27,19 @@ class StationList(generics.ListAPIView):
         city_name = self.request.query_params.get("city", None)
         state_name = self.request.query_params.get("state", None)
         country_name = self.request.query_params.get("country", None)
+        genre_name = self.request.query_params.getlist("genres[]", None)
 
         if city_name:
             queryset = queryset.filter(city__city_name__icontains=city_name)
 
         if state_name:
-            queryset = queryset.filter(city__state__state_name__icontains=state_name)
+            queryset = queryset.filter(state__state_name__icontains=state_name)
 
         if country_name:
-            queryset = queryset.filter(city__state__country__country_name__icontains=country_name)
+            queryset = queryset.filter(country__country_name__icontains=country_name)
+
+        if genre_name:
+            queryset = queryset.filter(genres__id__in=genre_name)
 
         return queryset
 
