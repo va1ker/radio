@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.contrib.auth.models import User
 
 # class User(models.User):
 #     username = models.CharField(max_length=100)
@@ -37,7 +38,7 @@ class Station(models.Model):
     station_name = models.CharField(max_length=100)
     frequency = models.JSONField()
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True)
-    state = models.ForeignKey(State, on_delete=models.CASCADE,null=True)
+    state = models.ForeignKey(State, on_delete=models.CASCADE, null=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     genres = models.ManyToManyField(Genre)
     contacts = models.JSONField()
@@ -51,6 +52,14 @@ class Station(models.Model):
     #     return self.likes.count()
 
 
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    station = models.ForeignKey(Station, on_delete=models.CASCADE, related_name="likes")
+
+    class Meta:
+        unique_together = ("user", "station")
+
+
 # class Podcats(models.Model):
 #     podcast_name = models.CharField(max_length=100)
 #     category = models.ForeignKey(max_length=100)
@@ -58,4 +67,3 @@ class Station(models.Model):
 #     contacts = models.JSONField()
 #     socials = models.JSONField()
 #     likes = models.PositiveIntegerField()
-

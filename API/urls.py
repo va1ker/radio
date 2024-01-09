@@ -1,6 +1,6 @@
 from django.urls import path
 
-from API.views import StationList, GenreList, UserCreateView
+from API.views import LikeStation, StationList, GenreList, UserCreateView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -9,4 +9,5 @@ urlpatterns = [
     path("register/", UserCreateView.as_view()),
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("like/", LikeStation.as_view(), name="like-station"),
 ]

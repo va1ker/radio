@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework import generics, serializers
 from django.contrib.auth.models import User
+from django.db.models import Count
 
-from .models import City, Country, Genre, Links, Station
+from .models import City, Country, Genre, Links, Station, Like
 from .serializers import (
     CitySerializer,
     CountrySerializer,
@@ -10,7 +11,19 @@ from .serializers import (
     LinksSerializer,
     StationSerializer,
     UserSerializer,
+    LikeSerializer,
 )
+
+from rest_framework.permissions import IsAuthenticated
+
+
+class LikeStation(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = LikeSerializer
+    queryset = Like.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -19,11 +32,10 @@ class UserCreateView(generics.CreateAPIView):
 
 
 class StationList(generics.ListAPIView):
-    queryset = Station.objects.all()
     serializer_class = StationSerializer
 
     def get_queryset(self):
-        queryset = Station.objects.all()
+        queryset = Station.objects.annotate(likes_count=Count("likes"))
         city_name = self.request.query_params.get("city", None)
         state_name = self.request.query_params.get("state", None)
         country_name = self.request.query_params.get("country", None)
@@ -41,7 +53,7 @@ class StationList(generics.ListAPIView):
         if genre_name:
             queryset = queryset.filter(genres__id__in=genre_name)
 
-        return queryset
+        return queryset.all().order_by("-likes_count")
 
 
 class CountryList(generics.ListAPIView):

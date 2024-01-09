@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import City, Country, Genre, Links, Station
+from .models import City, Country, Genre, Like, Links, Station
 
 from django.contrib.auth.models import User
 
@@ -18,9 +18,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class StationSerializer(serializers.ModelSerializer):
+    likes_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Station
         fields = "__all__"
+
+    def get_likes_count(self, instance):
+        return instance.likes.count()
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -45,3 +50,8 @@ class GenresSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = "__all__"
+
+class LikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Like
+        fields = '__all__'
